@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <title>Integração Stipe</title>
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300;400&display=swap" rel="stylesheet">
+    <link href='https://unpkg.com/boxicons@2.1.1/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://js.stripe.com/v3/"></script>
+</head>
+<body>
+    <div class="card">
+        <div class="card-header">
+            <h3>NBA 2K23</h3>
+            <p>PS5</p>
+            <span>New</span>
+        </div>
+        <div class="card-img">
+            <img src="https://lmtech.dev.br/api/games/public/imagens/games/1663396712074.jpg" alt="NBA2k23 game image">
+        </div>
+        <div class="card-details">
+            <div class="price">
+                <p>Preço</p>
+                <strong>R$ 100,00</strong>
+            </div>
+            <br> <br>
+        <div class="card-footer">
+            <button id="btn">Comprar agora</button>
+        </div>
+    </div>
+</body>
+
+  <script type="text/javascript">
+    // chave pública do stripe
+    var stripe = Stripe("pk_test_51MxuflKAqput44t2dge1GL8kgCSWRg2TQQb51Vl9WlEi8Gi7gPK1jg3ek67BAMBgS75FQh7hEn0VbDVQ7d7bx7PO00rcplkcFF");
+    var checkoutButton = document.getElementById("btn");
+
+    checkoutButton.addEventListener("click", function () {
+      fetch("/api/payment", {
+        headers: {'Content-Type': 'application/json'},
+        method: "POST",
+        body: JSON.stringify({
+            "product": {
+                "name": "NBA 2K23", 
+                "image": "https://lmtech.dev.br/api/games/public/imagens/games/1663396712074.jpg", 
+                "amount": 100,
+                "quantity": 1,
+            },
+          })
+      })
+        .then(function (response) {
+          return response.json();
+        })
+        .then(function (session) {
+          return stripe.redirectToCheckout({ sessionId: session.id });
+        })
+        .then(function (result) {
+          if (result.error) {
+            alert(result.error.message);
+          }
+        })
+        .catch(function (error) {
+          console.error("Error:", error);
+        });
+    });
+  </script>
+</html>
